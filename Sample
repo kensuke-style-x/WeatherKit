@@ -1,0 +1,67 @@
+import UIKit
+import WeatherKit
+import CoreLocation
+
+
+@available(iOS 16.0, *)
+class ViewController: UIViewController, CLLocationManagerDelegate {
+    
+    let service = WeatherService()
+    let locationManager = CLLocationManager()
+    
+    @IBOutlet weak var weatherTemperature: UILabel!
+    
+    @IBOutlet weak var weatherCondition: UILabel!
+    
+    @IBOutlet weak var weatherImage: UIImageView!
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        //CoreLocation
+        locationManager.delegate = self
+        
+        getUserLocation()
+        
+        
+    }
+    
+    func getUserLocation(){
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.startUpdatingLocation()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
+        guard let location = locations.first else {
+            return
+        }
+        locationManager.stopUpdatingLocation()
+        
+        getWeather(location: location)
+    }
+    
+    func getWeather(location:CLLocation){
+        
+        Task{
+            do {
+                let result = try await service.weather(for: location)
+                print(String(describing: result.currentWeather))
+                print(String(describing: result.dailyForecast))
+               
+                weatherTemperature.text = result.currentWeather.temperature.description
+                
+                weatherCondition.text = result.currentWeather.condition.description
+                
+                weatherImage.image = UIImage(systemName: result.currentWeather.symbolName)
+                
+                
+            } catch {
+                print(error)
+            }
+        }
+        
+    }
+
+}
+
