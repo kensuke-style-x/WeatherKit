@@ -75,9 +75,9 @@ func dayWeather(location:CLLocation){
             do {
                 let dailyResult = try await service.weather(for: location, including: .daily)
                 
-                highTemperature.text = dailyResult.forecast.last?.highTemperature.description
+                highTemperature.text = dailyResult.forecast.first?.highTemperature.description
                 
-                lowTemperature.text = dailyResult.forecast.last?.lowTemperature.description
+                lowTemperature.text = dailyResult.forecast.first?.lowTemperature.description
                 
             } catch {
                 print("Daily weather service is error...")
